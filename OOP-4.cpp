@@ -8,11 +8,10 @@ private:
     int hour;
     int minute;
     int second;
-    bool isOurEra;
 
 public:
     // Конструктор по умолчанию
-    Date() : year(1960), month(1), day(1), hour(0), minute(0), second(0), isOurEra(true) {}
+    Date() : year(1960), month(1), day(1), hour(0), minute(0), second(0) {}
 
     Date(int year, int month, int day, int hour, int minute, int second) {
         this->year = year;
@@ -21,7 +20,6 @@ public:
         this->hour = hour;
         this->minute = minute;
         this->second = second;
-        this->isOurEra = (year >= 0) ? true : false;
     }
     // Методы add и subtract
     Date add(int years, int months, int days, int hours, int minutes, int seconds) const;
@@ -102,8 +100,7 @@ Date Date::subtract(int years, int months, int days, int hours, int minutes, int
 
 bool Date::operator==(const Date& other) const {
     return year == other.year && month == other.month && day == other.day &&
-        hour == other.hour && minute == other.minute && second == other.second &&
-        isOurEra == other.isOurEra;
+        hour == other.hour && minute == other.minute && second == other.second;
 }
 
 bool Date::operator<(const Date& other) const {
@@ -127,7 +124,6 @@ Date& Date::operator=(const Date& other) {
         hour = other.hour;
         minute = other.minute;
         second = other.second;
-        isOurEra = other.isOurEra;
     }
     return *this;
 }
@@ -151,8 +147,13 @@ Date& Date::operator-=(const Date& other) {
 }
 
 std::ostream& operator<<(std::ostream& os, const Date& date) {
-    std::string era = date.isOurEra ? "AD" : "BC";
-    os << date.hour << ":" << date.minute << ":" << date.second << " - " << date.day << "." << date.month << "." << date.year << " " << era;
+    std::string era = date.year>=0 ? "AD" : "BC";
+    if (era == "AD") {
+        os << date.hour << ":" << date.minute << ":" << date.second << " - " << date.day << "." << date.month << "." << date.year << " " << era;
+    }
+    else {
+        os << date.hour << ":" << date.minute << ":" << date.second << " - " << date.day << "." << date.month << "." << -date.year << " " << era;
+    }
     return os;
 }
 
@@ -306,18 +307,22 @@ void Date::normalizeDate() {
 }
 
 int main() {
-    // Пример использования
-    Date date_default;
-    Date date1(2000, 11, 30, 2, 5, 6);
+    Date d1;
+    std::cout << d1  << std::endl;
+    Date d2(2060, 1, 1, 0, 0, 0);
+    std::cout << (d1 > d2) << std::endl;
+    std::cout << (d1 < d2) << std::endl;
+    std::cout << (d1 == d2) << std::endl;
+    Date d3 = d2.subtract(2060, 1, 1, 0, 0, 0);
+    Date d4(d3 + d2 - d1);
+    Date d5(d4);
+    d4 += d5 - d4.add(40, 1, 1, 0, 0, 0);
 
-    std::cout << date_default << std::endl;  // Выведет: 1960 1-1 0:0:0 AD
-
-    Date date_new = date_default.add(1, 3, 0, 0, 0, 0);
-
-    std::cout << (date_default - date1) << std::endl;
-
-    std::cout << date_new << std::endl;  // Выведет: 1961 4-1 0:0:0 AD
+    std::cout << d3 << std::endl;
+    std::cout << d4 << std::endl;
+    std::cout << d5 << std::endl;
 
     return 0;
 }
+
 
